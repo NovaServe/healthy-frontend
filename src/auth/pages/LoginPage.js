@@ -5,8 +5,12 @@ import { useNavigate } from 'react-router-dom';
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import Alert from '../../shared/components/Alert.js';
 import ValidationMessage from '../../shared/components/ValidationMessage.js';
+import AlertsList from '../../shared/components/AlertsList.js';
 import { login, setToken } from '../services/auth.js';
 import { validateLoginForm } from '../services/validation.js';
+import { buildAlertsList } from '../../shared/services/util.js';
+import { SUCCESS, WARNING } from '../../shared/services/message.js';
+import { LOGIN_ERROR, LOGIN_SUCCESS } from '../services/message.js';
 
 const LoginPage = ({ globalMessage }) => {
 	const navigate = useNavigate();
@@ -23,6 +27,8 @@ const LoginPage = ({ globalMessage }) => {
 
 	const [message, setMessage] = useState("");
 	const [messageType, setMessageType] = useState("");
+	const [messagesList, setMessagesList] = useState([]);
+	const [messagesType, setMessagesType] = useState("");
 	const dispatch = useDispatch();
 
 	const handleChange = (e) => {
@@ -45,6 +51,8 @@ const LoginPage = ({ globalMessage }) => {
 		});
 		setMessage('');
 		setMessageType('');
+		setMessagesType('');
+		setMessagesList([]);
 	}
 
 	const handleSubmit = (e) => {
@@ -58,13 +66,20 @@ const LoginPage = ({ globalMessage }) => {
 					setToken(response.body.token);
 					navigate('/workouts');
 					dispatch({ type: 'CLEAR_GLOBAL_MESSAGE' });
+					setMessage(LOGIN_SUCCESS);
+					setMessageType(SUCCESS);
+					setMessagesType('');
+					setMessagesList([]);
+				} else if (response.status === 401) {
+          setMessageType(WARNING);
+				  setMessage(LOGIN_ERROR);
 				} else {
-					setMessageType("WARNING");
-					setMessage("Invalid credentials");
-					console.log(response);
+					const messages = buildAlertsList(response.body)
+					setMessagesType(WARNING);
+					setMessagesList(messages);
 				}
 			} catch (error) {
-				setMessageType("WARNING");
+				setMessageType(WARNING);
 				setMessage(error.message);
 			}
 		};
@@ -92,7 +107,10 @@ const LoginPage = ({ globalMessage }) => {
 			{globalMessage && globalMessage.body ?
 				<Alert message={globalMessage.body.message} messageType={globalMessage.body.messageType} /> : <></>}
 
-			<Alert message={message} messageType={messageType} />
+      {messagesList && messagesList.length > 0 &&
+        (<AlertsList messages={messagesList} messageType={messagesType} />)}
+			
+	    <Alert message={message} messageType={messageType} />
 
 			<form onSubmit={handleSubmit} className="form-custom" style={{ width: 'fit-content' }}>
 
