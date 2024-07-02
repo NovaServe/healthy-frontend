@@ -3,9 +3,9 @@ const containsForbiddenChars = (str, forbiddenChars) => {
 };
 
 export const validateEmail = (email) => {
-    const emailInvalidChars = [' ', ',', ';', '<', '>', '(', ')', '[', ']', '\\', '\"', '$', '%', '^', '*'];
-    const minEmailLength = 7;
-    const maxEmailLength = 60;
+    const invalidChars = [' ', ',', ';', '<', '>', '(', ')', '[', ']', '\\', '\"', '$', '%', '^', '*'];
+    const minLength = 7;
+    const maxLength = 60;
     let message = '';
 
     if (email) {
@@ -25,12 +25,12 @@ export const validateEmail = (email) => {
             }
         }
 
-        if (email.length < minEmailLength || email.length > maxEmailLength) {
-            message += 'Email length should be between ' + minEmailLength + ' and ' + maxEmailLength + ' characters. ';
+        if (email.length < minLength || email.length > maxLength) {
+            message += 'Email length should be between ' + minLength + ' and ' + maxLength + ' characters. ';
         }
 
-        if (containsForbiddenChars(email, emailInvalidChars)) {
-            message += `Email contains forbidden characters: (${emailInvalidChars.join(' ')}). `;
+        if (containsForbiddenChars(email, invalidChars)) {
+            message += `Email contains forbidden characters: (${invalidChars.join(' ')}). `;
         }
     } else {
         message += 'Email is required. ';
@@ -40,18 +40,18 @@ export const validateEmail = (email) => {
 };
 
 export const validateFullname = (fullname) => {
-    const usernameInvalidChars = [',', ';', '<', '>', '(', ')', '[', ']', '\\', '\"', '$', '%', '^', '&', '*'];
-    const minUsernameLength = 2;
-    const maxUsernameLength = 50;
+    const invalidChars = [',', ';', '<', '>', '(', ')', '[', ']', '\\', '\"', '$', '%', '^', '&', '*'];
+    const minLength = 2;
+    const maxLength = 50;
     let message = '';
 
     if (fullname) {
-        if (containsForbiddenChars(fullname, usernameInvalidChars)) {
-            message += `Fullname contains forbidden characters: (${usernameInvalidChars.join(' ')}). `;
+        if (containsForbiddenChars(fullname, invalidChars)) {
+            message += `Fullname contains forbidden characters: (${invalidChars.join(' ')}). `;
         }
 
-        if (fullname.length < minUsernameLength || fullname.length > maxUsernameLength) {
-            message += `Fullname length should be between ${minUsernameLength} and ${maxUsernameLength} characters. `;
+        if (fullname.length < minLength || fullname.length > maxLength) {
+            message += `Fullname length should be between ${minLength} and ${maxLength} characters. `;
         }
 
     } else {
@@ -62,18 +62,18 @@ export const validateFullname = (fullname) => {
 };
 
 export const validateUsername = (username) => {
-    const usernameInvalidChars = [' ', ',', ';', '<', '>', '(', ')', '[', ']', '\\', '\"', '$', '%', '^', '&', '*'];
-    const minUsernameLength = 5;
-    const maxUsernameLength = 20;
+    const invalidChars = [' ', ',', ';', '<', '>', '(', ')', '[', ']', '\\', '\"', '$', '%', '^', '&', '*'];
+    const minLength = 5;
+    const maxLength = 20;
     let message = '';
 
     if (username) {
-        if (containsForbiddenChars(username, usernameInvalidChars)) {
-            message += `Username contains forbidden characters: (${usernameInvalidChars.join(' ')}). `;
+        if (containsForbiddenChars(username, invalidChars)) {
+            message += `Username contains forbidden characters: (${invalidChars.join(' ')}). `;
         }
 
-        if (username.length < minUsernameLength || username.length > maxUsernameLength) {
-            message += `Username length should be between ${minUsernameLength} and ${maxUsernameLength} characters. `;
+        if (username.length < minLength || username.length > maxLength) {
+            message += `Username length should be between ${minLength} and ${maxLength} characters. `;
         }
 
     } else {
