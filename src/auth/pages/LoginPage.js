@@ -71,8 +71,8 @@ const LoginPage = ({ globalMessage }) => {
 					setMessagesType('');
 					setMessagesList([]);
 				} else if (response.status === 401) {
-          setMessageType(WARNING);
-				  setMessage(LOGIN_ERROR);
+					setMessageType(WARNING);
+					setMessage(LOGIN_ERROR);
 				} else {
 					const messages = buildAlertsList(response.body)
 					setMessagesType(WARNING);
@@ -107,10 +107,10 @@ const LoginPage = ({ globalMessage }) => {
 			{globalMessage && globalMessage.body ?
 				<Alert message={globalMessage.body.message} messageType={globalMessage.body.messageType} /> : <></>}
 
-      {messagesList && messagesList.length > 0 &&
-        (<AlertsList messages={messagesList} messageType={messagesType} />)}
-			
-	    <Alert message={message} messageType={messageType} />
+			{messagesList && messagesList.length > 0 &&
+				(<AlertsList messages={messagesList} messageType={messagesType} />)}
+
+			<Alert message={message} messageType={messageType} />
 
 			<form onSubmit={handleSubmit} className="form-custom" style={{ width: 'fit-content' }}>
 
