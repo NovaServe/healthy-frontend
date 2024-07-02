@@ -4,8 +4,8 @@ const containsForbiddenChars = (str, forbiddenChars) => {
 
 export const validateEmail = (email) => {
     const emailInvalidChars = [' ', ',', ';', '<', '>', '(', ')', '[', ']', '\\', '\"', '$', '%', '^', '*'];
-    const minEmailLength = 3;
-    const maxEmailLength = 50;
+    const minEmailLength = 7;
+    const maxEmailLength = 60;
     let message = '';
 
     if (email) {
@@ -39,9 +39,52 @@ export const validateEmail = (email) => {
     return message;
 };
 
+export const validateFullname = (fullname) => {
+    const usernameInvalidChars = [',', ';', '<', '>', '(', ')', '[', ']', '\\', '\"', '$', '%', '^', '&', '*'];
+    const minUsernameLength = 2;
+    const maxUsernameLength = 50;
+    let message = '';
+
+    if (fullname) {
+        if (containsForbiddenChars(fullname, usernameInvalidChars)) {
+            message += `Fullname contains forbidden characters: (${usernameInvalidChars.join(' ')}). `;
+        }
+
+        if (fullname.length < minUsernameLength || fullname.length > maxUsernameLength) {
+            message += `Fullname length should be between ${minUsernameLength} and ${maxUsernameLength} characters. `;
+        }
+
+    } else {
+        message += 'Fullname is required. ';
+    }
+
+    return message;
+};
+
+export const validateUsername = (username) => {
+    const usernameInvalidChars = [' ', ',', ';', '<', '>', '(', ')', '[', ']', '\\', '\"', '$', '%', '^', '&', '*'];
+    const minUsernameLength = 5;
+    const maxUsernameLength = 20;
+    let message = '';
+
+    if (username) {
+        if (containsForbiddenChars(username, usernameInvalidChars)) {
+            message += `Username contains forbidden characters: (${usernameInvalidChars.join(' ')}). `;
+        }
+
+        if (username.length < minUsernameLength || username.length > maxUsernameLength) {
+            message += `Username length should be between ${minUsernameLength} and ${maxUsernameLength} characters. `;
+        }
+
+    } else {
+        message += 'Username is required. ';
+    }
+
+    return message;
+};
 export const validatePassword = (password) => {
     const invalidChars = [' ', ',', ';', '<', '>', '(', ')', '[', ']', '\\', '\"', '$', '%', '^', '*'];
-    const minLength = 3;
+    const minLength = 10;
     const maxLength = 20;
     let message = '';
 
@@ -131,8 +174,8 @@ export const validateTitle = (title) => {
 
 export const validateForm = (formData) => {
     const errors = {
-        fullName: validateTitle(formData.fullName),
-        username: validateTitle(formData.username),
+        fullName: validateFullname(formData.fullName),
+        username: validateUsername(formData.username),
         email: validateEmail(formData.email),
         password: validatePassword(formData.password),
         confirmPassword: validateConfirmPassword(formData.password, formData.confirmPassword),
