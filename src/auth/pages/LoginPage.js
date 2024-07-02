@@ -74,11 +74,7 @@ const LoginPage = ({ globalMessage }) => {
 		if (validation.isValid) {
 			fetchLogin();
 		} else {
-			setValidationMessage({
-				isValid: false,
-				usernameOrEmail: validation.usernameOrEmail,
-				password: validation.password,
-			});
+			setValidationMessage(validation);
 		}
 	};
 
