@@ -89,6 +89,7 @@ const ListMedia = ({ urlHistory }) => {
                 }
             } catch (error) {
                 setMessageType(WARNING);
+                console.log(error.status);
                 setMessage(error.message);
             }
         };

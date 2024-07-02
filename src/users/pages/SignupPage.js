@@ -10,7 +10,7 @@ import { getCountries, signup, getTimezones } from '../services/requests.js';
 import { validateForm } from '../services/validation.js';
 import { buildAlertsList } from '../../shared/services/util.js';
 import { SUCCESS, WARNING } from '../../shared/services/message.js';
-import { SIGNUP_SUCCESSFULL } from '../services/message.js';
+import { ACCOUNT_EXISTS, ALREADY_EXISTS, SIGNUP_FAILED, SIGNUP_SUCCESSFULL } from '../services/message.js';
 import '../../shared/style/form.css';
 import ValidationMessage from '../../shared/components/ValidationMessage.js';
 
@@ -39,9 +39,10 @@ const SignupPage = () => {
         timezoneId: '',
         age: '',
     });
-    const [message, setMessage] = useState('');
-    const [messageType, setMessageType] = useState('');
-    const [messages, setMessages] = useState([]);
+    const [message, setMessage] = useState("");
+    const [messageType, setMessageType] = useState("");
+    const [messagesList, setMessagesList] = useState([]);
+    const [messagesType, setMessagesType] = useState("");
     const dispatch = useDispatch();
 
     useEffect(() => {
@@ -86,7 +87,9 @@ const SignupPage = () => {
         });
         setMessage('');
         setMessageType('');
-        setMessages([]);
+        setMessagesList([]);
+        setMessagesType('');
+
     }
 
     const handleSubmit = (e) => {
@@ -96,6 +99,7 @@ const SignupPage = () => {
         const fetchSignup = async () => {
             try {
                 const response = await signup(formData);
+
                 if (response.status === 201) {
                     dispatch({
                         type: 'SET_GLOBAL_MESSAGE',
@@ -105,14 +109,28 @@ const SignupPage = () => {
                         }
                     });
                     navigate('/login');
+                } else if (response.status === 400) {
+                    const responseBody = response.body || {};
+                    const message = responseBody.message || null;
+
+                    if (message === ALREADY_EXISTS) {
+                        setMessageType(WARNING);
+                        setMessage(ACCOUNT_EXISTS);
+                    } else {
+                        const messages = buildAlertsList(responseBody);
+                        setMessagesType(WARNING);
+                        setMessagesList(messages);
+                    }
                 } else {
-                    setMessages(buildAlertsList(response.body, WARNING));
+                    setMessageType(WARNING);
+                    setMessage(SIGNUP_FAILED);
                 }
             } catch (error) {
                 setMessageType(WARNING);
-                setMessage(error.message);
+                setMessage(`Error: ${error.message}`);
             }
         };
+
 
         const validation = validateForm(formData);
         if (validation.isValid) {
@@ -135,7 +153,8 @@ const SignupPage = () => {
 
             <Alert message={message} messageType={messageType} />
 
-            <AlertsList messages={messages} />
+            {messagesList && messagesList.length > 0 &&
+                (<AlertsList messages={messagesList} messageType={messagesType} />)}
 
             <form onSubmit={handleSubmit} style={{ width: 'fit-content' }} className='form-custom mb-5'>
 
@@ -248,7 +267,7 @@ const SignupPage = () => {
                             ))}
                         </select>
                         {validationMessage && !validationMessage.isValid && validationMessage.timezoneId
-                        && (<ValidationMessage message={validationMessage.timezoneId} />)}
+                            && (<ValidationMessage message={validationMessage.timezoneId} />)}
                     </div>
                 )}
 
