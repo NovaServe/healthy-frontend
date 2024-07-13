@@ -47,11 +47,17 @@ export const signup = async (requestBody) => {
         body: JSON.stringify(requestBody)
     });
 
-    if (response.status !== 201) {
-        throw new Error(`Failed to signup: ${response.status}`);
+    if (response.status === 201) {
+        return { status: response.status };
     }
 
+    // if (response.status !== 201) {
+    //     throw new Error(`Failed to signup: ${response.status}`);
+    // }
+    const data = await response.json();
+
     return {
-        status: response.status
+        status: response.status,
+        body: data,
     };
 };
