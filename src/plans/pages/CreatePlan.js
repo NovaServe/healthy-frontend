@@ -329,11 +329,11 @@ const CreatePlan = ({ isLoggedIn, urlHistory }) => {
                             <input type='date' id='endDate' name='endDate' value={endDate}
                                 onChange={(e) => setEndDate(e.target.value)} className='form-input' required></input>
                             {validationMessage && !validationMessage.isValid && validationMessage.endDate !== ''
-                                && <ValidationMessage message={validationMessage.endDate} />}
+                                && (<ValidationMessage message={validationMessage.endDate} />)}
                         </div>
 
                         {validationMessage && !validationMessage.isValid && validationMessage.repeatDays !== ''
-                            && <ValidationMessage message={validationMessage.repeatDays} />}
+                            && (<ValidationMessage message={validationMessage.repeatDays} />)}
                     </>
                 )}
 

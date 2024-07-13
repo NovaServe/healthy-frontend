@@ -3,11 +3,14 @@ import { connect } from 'react-redux';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { Helmet, HelmetProvider } from "react-helmet-async";
-
-import { Form, Button } from 'react-bootstrap';
 import Alert from '../../shared/components/Alert.js';
-
+import ValidationMessage from '../../shared/components/ValidationMessage.js';
+import AlertsList from '../../shared/components/AlertsList.js';
 import { login, setToken } from '../services/auth.js';
+import { validateLoginForm } from '../services/validation.js';
+import { buildAlertsList } from '../../shared/services/util.js';
+import { SUCCESS, WARNING } from '../../shared/services/message.js';
+import { LOGIN_ERROR, LOGIN_SUCCESS } from '../services/message.js';
 
 const LoginPage = ({ globalMessage }) => {
 	const navigate = useNavigate();
@@ -15,8 +18,17 @@ const LoginPage = ({ globalMessage }) => {
 		usernameOrEmail: '',
 		password: ''
 	});
+
+	const [validationMessage, setValidationMessage] = useState({
+		isValid: true,
+		usernameOrEmail: '',
+		password: '',
+	});
+
 	const [message, setMessage] = useState("");
 	const [messageType, setMessageType] = useState("");
+	const [messagesList, setMessagesList] = useState([]);
+	const [messagesType, setMessagesType] = useState("");
 	const dispatch = useDispatch();
 
 	const handleChange = (e) => {
@@ -32,13 +44,21 @@ const LoginPage = ({ globalMessage }) => {
 			usernameOrEmail: '',
 			password: ''
 		});
+		setValidationMessage({
+			isValid: true,
+			usernameOrEmail: '',
+			password: '',
+		});
 		setMessage('');
 		setMessageType('');
+		setMessagesType('');
+		setMessagesList([]);
 	}
 
 	const handleSubmit = (e) => {
 		e.preventDefault();
 		handleClear();
+
 		const fetchLogin = async () => {
 			try {
 				const response = await login(formData);
@@ -46,17 +66,31 @@ const LoginPage = ({ globalMessage }) => {
 					setToken(response.body.token);
 					navigate('/workouts');
 					dispatch({ type: 'CLEAR_GLOBAL_MESSAGE' });
+					setMessage(LOGIN_SUCCESS);
+					setMessageType(SUCCESS);
+					setMessagesType('');
+					setMessagesList([]);
+				} else if (response.status === 401) {
+					setMessageType(WARNING);
+					setMessage(LOGIN_ERROR);
 				} else {
-					setMessageType("WARNING");
-					setMessage("Invalid credentials");
-					console.log(response);
+					const messages = buildAlertsList(response.body)
+					setMessagesType(WARNING);
+					setMessagesList(messages);
 				}
 			} catch (error) {
-				setMessageType("WARNING");
+				setMessageType(WARNING);
 				setMessage(error.message);
 			}
 		};
-		fetchLogin();
+
+		const validation = validateLoginForm(formData.usernameOrEmail, formData.password);
+
+		if (validation.isValid) {
+			fetchLogin();
+		} else {
+			setValidationMessage(validation);
+		}
 	};
 
 	return (
@@ -73,30 +107,50 @@ const LoginPage = ({ globalMessage }) => {
 			{globalMessage && globalMessage.body ?
 				<Alert message={globalMessage.body.message} messageType={globalMessage.body.messageType} /> : <></>}
 
-			{/* <AlertComponent message={message} messageType={messageType} /> */}
+			{messagesList && messagesList.length > 0 &&
+				(<AlertsList messages={messagesList} messageType={messagesType} />)}
 
-			<Form onSubmit={handleSubmit} style={{ width: 'fit-content' }}>
+			<Alert message={message} messageType={messageType} />
 
-				<Form.Group className="mb-3" controlId="usernameOrEmail">
-					<Form.Label>Username or Email</Form.Label>
-					<Form.Control type="text" name="usernameOrEmail" placeholder="Enter username or email"
-						value={formData.usernameOrEmail} onChange={handleChange} required />
-				</Form.Group>
+			<form onSubmit={handleSubmit} className="form-custom" style={{ width: 'fit-content' }}>
 
-				<Form.Group className="mb-3" controlId="password">
-					<Form.Label>Password</Form.Label>
-					<Form.Control type="password" name="password" placeholder="Password"
-						value={formData.password} onChange={handleChange} required />
-				</Form.Group>
+				<div className="form-group mb-3" controlId="usernameOrEmail">
+					<label className="form-label" for="usernameOrEmail">Username or Email</label>
+					<input
+						type="text"
+						className="form-input"
+						name="usernameOrEmail"
+						id="usernameOrEmail"
+						placeholder="Enter username or email"
+						value={formData.usernameOrEmail}
+						onChange={handleChange}
+						required
+					/>
+					{validationMessage && !validationMessage.isValid && !validationMessage.usernameOrEmail !== ''
+						&& (<ValidationMessage message={validationMessage.usernameOrEmail} />)}
+				</div>
 
-				<Button onClick={handleClear} variant="primary" className='me-3'>
+				<div className="form-group mb-3" controlId="password">
+					<label className="form-label" for="password">Password</label>
+					<input
+						type="password"
+						className="form-input" name="password" id="password" placeholder="Password"
+						value={formData.password}
+						onChange={handleChange}
+						required
+					/>
+					{validationMessage && !validationMessage.isValid && !validationMessage.password !== ''
+						&& (<ValidationMessage message={validationMessage.password} />)}
+				</div>
+
+				<button type='button' className="form-btn me-3" onClick={handleClear} variant="primary">
 					Clear
-				</Button>
+				</button>
 
-				<Button variant="primary" type="submit">
+				<button className="form-btn" variant="primary">
 					Submit
-				</Button>
-			</Form>
+				</button>
+			</form>
 		</div>
 	);
 }
