@@ -5,10 +5,10 @@ import globalMessageReducer from './globalMessageReducer';
 import urlHistoryReducer from './urlHistoryReducer';
 
 const rootReducer = combineReducers({
-	isLoggedIn: loginReducer,
-	userData: userDataReducer,
-	globalMessage: globalMessageReducer,
-	urlHistory: urlHistoryReducer
+  isLoggedIn: loginReducer,
+  userData: userDataReducer,
+  globalMessage: globalMessageReducer,
+  urlHistory: urlHistoryReducer
 });
 
 export default rootReducer;
